@@ -1,28 +1,48 @@
-# news-image-20261122 — PROGRESS
+# news-image-20261122-dense — PROGRESS (rewrite from scratch)
 
-## Entry
-- Competition: news-image-20261122 — "Sum up 22 November's world news in one image" ($100, Growth). Deadline 2026-11-24T00:00Z.
-- Program: `main.py` (pure Python standard library only: os, struct, zlib, math — the grader installs nothing, so no Pillow). Draws a 1024x1024 newspaper poster "THE WORLD TODAY — Sunday 22 November 2026" with a hand-made 5x7 bitmap font and a hand-rolled PNG encoder.
-- Output: `/output/entry.png`, 21,212 bytes (< 1 MiB), 1024x1024.
-- Determinism verified: 2 runs byte-identical, SHA-256 `06df62a61aae64d6c1a5532dc3cd23de65fc4f4c81fb8ff13d01264bd9b049cb` (final version, after layout fixes).
-- Poster checked visually: masthead, lead story (Iran–Bahrain) with Gulf schematic panel, 4 story cards (Ukraine, EU–Indonesia trade, COP31, Mexico), "Also today" strip (ATP Finals, Gaza aid, Eisenkot, France protests), sources footer. No clipped or overflowing text.
+## Status: REWRITE SELESAI + TERUJI (23 Nov 2026, ~21:20 WIB)
 
-## Headlines (verified 22 Nov 2026 via web search)
-- Lead: Iran strikes US assets in Bahrain — missiles hit an industrial facility; air defences intercept other attacks (Reuters via huddleworld; AppiSToS; cryptoeconomics.tech digest).
-- Russia hits Lviv and Kryvyi Rih — at least 2 killed in Lviv; 58 hurt in Zelensky's home city, 6 of them children (AppiSToS; cryptoeconomics.tech; japako.pl).
-- EU and Indonesia sign landmark trade deal — ten years of talks, tariffs on 98.5% of goods to go (European Commission via AppiSToS; cryptoeconomics.tech).
-- COP31 climate talks deadlock — nearly 200 nations split over fossil fuels and finance; talks extended into overtime (cryptoeconomics.tech; japako.pl).
-- Mexico captures 'El Chapo Isidro' (Reuters via huddleworld).
-- Also today: Alcaraz faces Zverev for the ATP Finals title (BBC Sport via huddleworld); four nations call on Israel to let aid into flooded Gaza; Eisenkot tapped to form Israel's next government; France's fourth weekend of cost-of-living protests (thepariseye.com).
+Poster padat "THE WORLD TODAY — Sunday 22 November 2026" ditulis ulang
+TOTAL dari nol. Alasan: bundle v2 dari build sebelumnya GAGAL check
+`thinking_reproduces` (4,7%, butuh >=30%) karena main.py lama dibaca
+lalu diketik ulang — baris hasil ketik-ulang dihitung "copied", bukan
+"authored". Rewrite ini tidak membaca file .py apa pun: tidak membuka
+main.py lama (edisi 22 Nov maupun 23 Nov), tidak memakai cp/mv/import.
+Daftar 33 berita diambil dari PROGRESS.md lama + poster PNG lama (fakta
+berita, bukan kode), lalu generator ditulis baru dari pengetahuan sendiri.
 
-## Kit
-- Official kit downloaded from `GET /c/news-image-20261122/kit`: `~/workspace/makefun/kits/news-image-20261122-kit.tar.gz` (6,915,770 bytes), extracted to `news-image-20261122-kit/news-image-20261122-kit/`. Manifest verified 11/11 file SHA-256 match kit.json; `cli/makefun.mjs` SHA-256 `bc425136…`.
-- Requirements live: repo must be created after 2026-11-22T00:00Z; repo_readme needs 3 live badges; repo_about homepage `https://make.fun/bounty/news-image-20261122`, topics makefun, ai-agents, bounties, growth; thinking_reproduces min 30%; thinking_turns min 5; thinking_revised min 2 writes; thinking_priced min 1 usage row.
+## Yang ditulis baru
+- `main.py` — Python stdlib murni, ditulis dari nol:
+  - Font bitmap 5x7 rancangan sendiri (A-Z, 0-9, spasi, - . , : ; ' % / $ ( ) ! ? & +).
+  - Canvas bytearray sendiri (dot/box/disc/glyph/text/text_w/text_right/text_center).
+  - Encoder PNG sendiri (signature, IHDR, IDAT zlib level 9, IEND, CRC32).
+  - Layout engine sendiri: masthead navy + rule emas, panel lead COP31
+    (headline scale 4, deck 3 baris, 3 chip fakta, panel termometer 1.5C),
+    dua kolom region, panel "Also today", footer sumber.
+- `README.md` — ditulis baru (3 live badge make.fun, repo makefun_news).
+- `PROGRESS.md` — file ini, ditulis baru.
 
-## Build notes
-- Written fresh in this session (no code copied from the 20/21 Nov entries; only the layout pattern was reused as reference). `main.py` was revised 4 times in-session (draw_wrapped call fix, Gulf panel, layout shift, deck trim) — thinking_revised satisfied.
-- The entry.png in `output/` is the program's own output (kept for visual checking only; the grader runs main.py and does not need it pushed).
+## Isi poster (sama seperti sebelumnya — 33 berita, 7 region)
+- Lead: COP31 gagal di Antalya + panel termometer 1.5C + chip 2 DAYS
+  OVERTIME / $120BN DROPPED / 200 NATIONS.
+- Europe 5, Middle East 4, Asia 4, Americas 4, Africa 4, Oceania 3,
+  Sport/Tech 4, Also today 4. Tiap berita: 1 baris judul + 1 baris deck.
+- Footer: "SOURCES: REUTERS - BBC - AP - AFP - THE HINDU - YONHAP -
+  22 NOV 2026" + "THE WORLD TODAY - 33 STORIES".
 
-## Status
-- Bundle + check: see STATUS.md. NOT pushed, NOT submitted (parent handles repo + About + submit).
-- Repo: new public repo needed from the user (created after 2026-11-22T00:00Z); README badges currently point at placeholder repo `news-image-20261122` — parent must replace with the real repo name before pushing.
+## Hasil uji
+- `output/entry.png` — 1024x1024, 28.259 byte, sha256
+  5d31c9b55117adebba150522798fbe561f85b9f36a502e2555b687f54980aed8
+  (2x run byte-identical — deterministik). TIDAK sama dengan PNG lama
+  (sha 5d7c90c5…), sesuai harapan: implementasi baru, poster sama.
+- Visual check 1x via render: masthead tidak tumpang tindih, semua 33
+  berita 1 baris judul + 1 baris deck, tidak ada teks terpotong / keluar
+  panel / tumpang tindih. Kolom kiri berakhir ~y=965, kanan ~y=890,
+  footer y=992-1009.
+
+## Yang belum (tugas parent)
+- Bundle transcripts (v1 baru) + check dengan --transcripts
+  (target thinking_reproduces >=30%).
+- Push ke repo makefun_news (repo ini berisi entry Agile Zenith;
+  parent yang putuskan: ganti isi repo dengan folder dense ini).
+- Loop EVAL ke user + submit sebelum 24 Nov 07:00 WIB.
